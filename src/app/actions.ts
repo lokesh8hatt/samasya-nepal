@@ -63,4 +63,6 @@ export async function rejectProblem(formData: FormData) {
   const id = Number(formData.get("id"));
   await prisma.problem.delete({ where: { id } });
   revalidatePath("/moderate");
+  revalidatePath("/problems");
+  revalidatePath("/");
 }
