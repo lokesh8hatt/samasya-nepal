@@ -52,6 +52,28 @@ export async function getFilteredProblems(filters: {
   return filters.sort === "score" ? sortByImpactScore(problems) : problems;
 }
 
+export async function getPaginatedProblems(filters: {
+  q?: string;
+  category?: string;
+  sort?: "score" | "title";
+  page?: number;
+  pageSize?: number;
+}) {
+  const pageSize = filters.pageSize ?? 24;
+  const all = await getFilteredProblems(filters);
+  const total = all.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(Math.max(1, filters.page ?? 1), totalPages);
+  const start = (page - 1) * pageSize;
+  return {
+    items: all.slice(start, start + pageSize),
+    total,
+    page,
+    totalPages,
+    pageSize,
+  };
+}
+
 export async function getProblemById(id: number) {
   return prisma.problem.findFirst({ where: { id, approved: true } });
 }
